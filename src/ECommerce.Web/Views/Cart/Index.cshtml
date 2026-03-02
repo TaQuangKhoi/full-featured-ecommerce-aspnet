@@ -1,0 +1,111 @@
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Shopping Cart</h1>
+
+    <!-- Empty Cart -->
+    <template x-if="cart.length === 0">
+        <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
+            </svg>
+            <p class="mt-4 text-gray-500 dark:text-gray-400 text-lg">Your cart is empty</p>
+            <a asp-controller="Products" asp-action="Index" class="mt-6 inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition">
+                Continue Shopping
+            </a>
+        </div>
+    </template>
+
+    <!-- Cart with items -->
+    <template x-if="cart.length > 0">
+        <div class="space-y-6">
+            <!-- Cart Items Table -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Product</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Subtotal</th>
+                            <th class="px-6 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <template x-for="item in cart" :key="item.productId">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white" x-text="item.name"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400" x-text="'$' + item.price.toFixed(2)"></td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <input type="number" min="1" :value="item.quantity"
+                                           @@change="updateQuantity(item.productId, $event.target.value)"
+                                           class="w-20 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500" />
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white" x-text="'$' + (item.price * item.quantity).toFixed(2)"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <button @@click="removeFromCart(item.productId)" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium">
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-lg font-medium text-gray-700 dark:text-gray-300">Total:</span>
+                    <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400" x-text="'$' + cartTotal.toFixed(2)"></span>
+                </div>
+                <div class="flex gap-4">
+                    <a asp-controller="Products" asp-action="Index" class="flex-1 text-center border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        Continue Shopping
+                    </a>
+                    <button @@click="showCheckout = true" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-medium transition">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Checkout Section -->
+            <div x-data="{ showCheckout: false }" x-show="showCheckout" x-transition class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Shipping Address</h2>
+                <form x-data="{ address: '', submitting: false }"
+                      @@submit.prevent="
+                          submitting = true;
+                          fetch('/Cart/Checkout', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ items: cart, shippingAddress: address })
+                          })
+                          .then(r => r.json())
+                          .then(data => {
+                              if (data.success) {
+                                  clearCart();
+                                  Swal.fire({ icon: 'success', title: 'Order Placed!', text: 'Your order has been placed successfully.' })
+                                  .then(() => window.location.href = '/Orders');
+                              } else {
+                                  Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Failed to place order.' });
+                              }
+                              submitting = false;
+                          })
+                          .catch(() => { submitting = false; Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong.' }); });">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Shipping Address</label>
+                        <textarea x-model="address" rows="3" required placeholder="Enter your full shipping address..."
+                                  class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                    </div>
+                    <button type="submit" :disabled="submitting || !address.trim()"
+                            class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium transition">
+                        <span x-show="!submitting">Place Order</span>
+                        <span x-show="submitting">Processing...</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </template>
+</div>

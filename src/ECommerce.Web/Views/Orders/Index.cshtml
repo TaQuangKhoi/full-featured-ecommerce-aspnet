@@ -1,0 +1,62 @@
+@model ECommerce.Shared.DTOs.PaginatedResult<ECommerce.Shared.DTOs.OrderDto>
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">My Orders</h1>
+
+    @if (Model?.Items?.Any() == true)
+    {
+        <div class="space-y-4">
+            @foreach (var order in Model.Items)
+            {
+                var statusColor = order.Status switch
+                {
+                    "Completed" => "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+                    "Shipped" => "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+                    "Processing" => "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+                    "Cancelled" => "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+                    _ => "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                };
+
+                <a asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id"
+                   class="block bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Order #@order.Id.ToString().Substring(0, 8).ToUpper()</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">@order.OrderDate.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium @statusColor">@order.Status</span>
+                            <span class="text-lg font-bold text-gray-900 dark:text-white">$@order.Total.ToString("F2")</span>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="flex justify-center mt-10 space-x-2">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <a asp-controller="Orders" asp-action="Index" asp-route-page="@i"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition @(i == Model.Page ? "bg-indigo-600 text-white" : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600")">
+                        @i
+                    </a>
+                }
+            </nav>
+        }
+    }
+    else
+    {
+        <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+            <p class="text-gray-500 dark:text-gray-400 text-lg">You have no orders yet.</p>
+            <a asp-controller="Products" asp-action="Index" class="mt-6 inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition">
+                Start Shopping
+            </a>
+        </div>
+    }
+</div>

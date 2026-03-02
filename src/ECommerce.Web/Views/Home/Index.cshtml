@@ -1,8 +1,84 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model ECommerce.Shared.DTOs.PaginatedResult<ECommerce.Shared.DTOs.ProductDto>
+@{
+    ViewData["Title"] = "Home";
+    var categories = ViewBag.Categories as List<ECommerce.Shared.DTOs.CategoryDto> ?? new List<ECommerce.Shared.DTOs.CategoryDto>();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-6xl font-extrabold mb-4">Welcome to ECommerce</h1>
+        <p class="text-xl md:text-2xl text-indigo-100 mb-8 max-w-2xl mx-auto">Discover amazing products at unbeatable prices. Shop the latest trends today.</p>
+        <a asp-controller="Products" asp-action="Index"
+           class="inline-block bg-white text-indigo-600 px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
+            Shop Now →
+        </a>
+    </div>
+</section>
+
+<!-- Category Filter Bar -->
+@if (categories.Any())
+{
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="flex flex-wrap gap-3 justify-center">
+            <a asp-controller="Products" asp-action="Index"
+               class="px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-sm font-medium transition">
+                All
+            </a>
+            @foreach (var cat in categories)
+            {
+                <a asp-controller="Products" asp-action="Index" asp-route-category="@cat.Slug"
+                   class="px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-sm font-medium transition">
+                    @cat.Name
+                </a>
+            }
+        </div>
+    </section>
+}
+
+<!-- Featured Products -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Featured Products</h2>
+
+    @if (Model?.Items?.Any() == true)
+    {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @foreach (var product in Model.Items)
+            {
+                var initials = string.Join("", product.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(w => w[0])).ToUpper();
+                var colors = new[] { "from-pink-500 to-rose-500", "from-blue-500 to-cyan-500", "from-green-500 to-emerald-500", "from-purple-500 to-violet-500", "from-orange-500 to-amber-500" };
+                var color = colors[Math.Abs(product.Id.GetHashCode()) % colors.Length];
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow overflow-hidden group">
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id">
+                        <div class="h-48 bg-gradient-to-br @color flex items-center justify-center">
+                            <span class="text-4xl font-bold text-white opacity-80">@initials</span>
+                        </div>
+                    </a>
+                    <div class="p-5">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="block">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 truncate">@product.Name</h3>
+                        </a>
+                        @if (!string.IsNullOrEmpty(product.CategoryName))
+                        {
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">@product.CategoryName</p>
+                        }
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-xl font-bold text-indigo-600 dark:text-indigo-400">$@product.Price.ToString("F2")</span>
+                            <button @@click="addToCart('@product.Id', '@product.Name.Replace("'", "\\'")', @product.Price)"
+                                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-12">
+            <p class="text-gray-500 dark:text-gray-400 text-lg">No products available yet. Check back soon!</p>
+        </div>
+    }
+</section>
