@@ -33,7 +33,6 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
 
             var orderItem = new OrderItem
             {
-                OrderId = order.Id,
                 ProductId = item.ProductId,
                 Quantity = item.Quantity,
                 UnitPrice = product.Price
