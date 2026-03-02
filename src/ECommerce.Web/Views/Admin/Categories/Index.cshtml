@@ -1,0 +1,82 @@
+@model List<ECommerce.Shared.DTOs.CategoryDto>
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Manage Categories</h1>
+
+    <!-- Create Category Form -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Create Category</h2>
+        <form asp-controller="Admin" asp-action="CreateCategory" method="post" class="flex flex-col sm:flex-row gap-4">
+            @Html.AntiForgeryToken()
+            <div class="flex-grow">
+                <input type="text" name="Name" required placeholder="Category name"
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+            </div>
+            <div class="flex-grow">
+                <input type="text" name="Slug" required placeholder="category-slug"
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+            </div>
+            <div>
+                <select name="ParentId"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    <option value="">No parent</option>
+                    @if (Model != null)
+                    {
+                        @foreach (var cat in Model)
+                        {
+                            <option value="@cat.Id">@cat.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition whitespace-nowrap">
+                Add Category
+            </button>
+        </form>
+    </div>
+
+    <!-- Categories List -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        @if (Model?.Any() == true)
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Slug</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Parent</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach (var category in Model)
+                        {
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">@category.Name</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">@category.Slug</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">@(category.ParentName ?? "—")</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                    <form asp-controller="Admin" asp-action="DeleteCategory" asp-route-id="@category.Id" method="post" class="inline"
+                                          onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="text-red-600 dark:text-red-400 hover:underline font-medium">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-12 text-center text-gray-500 dark:text-gray-400">
+                <p class="text-lg">No categories yet. Create one above.</p>
+            </div>
+        }
+    </div>
+</div>

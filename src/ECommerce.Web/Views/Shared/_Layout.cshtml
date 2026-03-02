@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ dark: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': dark }">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ECommerce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js" integrity="sha384-ByOFKmuao3GhcLmhD8O6bkeDO2wiKBx/b8l8FPyHZNZCx0Xosg5pMPNBx2DRsmz" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0s9Gm/YDPGSYBkS/gBHQEiUFEkqFjBCnLMNye" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen flex flex-col transition-colors duration-300"
+      x-data="cartStore()" x-init="loadCart()">
+
+    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ mobileOpen: false }">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-8">
+                    <a asp-controller="Home" asp-action="Index" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                        🛒 ECommerce
+                    </a>
+                    <div class="hidden md:flex space-x-6">
+                        <a asp-controller="Home" asp-action="Index" class="text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">Home</a>
+                        <a asp-controller="Products" asp-action="Index" class="text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">Products</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Dark mode toggle -->
+                    <button @@click="dark = !dark; localStorage.setItem('darkMode', dark)"
+                            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                        <span x-show="!dark" class="text-xl">🌙</span>
+                        <span x-show="dark" class="text-xl">☀️</span>
+                    </button>
+
+                    <!-- Cart -->
+                    <a asp-controller="Cart" asp-action="Index" class="relative p-2 text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
+                        </svg>
+                        <span x-show="cartCount > 0"
+                              x-text="cartCount"
+                              class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"></span>
+                    </a>
+
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="hidden md:flex items-center space-x-3">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-controller="Admin" asp-action="Index" class="text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">Admin</a>
+                            }
+                            <a asp-controller="Orders" asp-action="Index" class="text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">Orders</a>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Logout</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="hidden md:flex items-center space-x-3">
+                            <a asp-controller="Account" asp-action="Login" class="text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium">Login</a>
+                            <a asp-controller="Account" asp-action="Register" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Register</a>
+                        </div>
+                    }
+
+                    <!-- Mobile menu button -->
+                    <button @@click="mobileOpen = !mobileOpen" class="md:hidden p-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <svg x-show="!mobileOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                        <svg x-show="mobileOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile menu -->
+            <div x-show="mobileOpen" x-transition class="md:hidden pb-4 space-y-2">
+                <a asp-controller="Home" asp-action="Index" class="block px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Home</a>
+                <a asp-controller="Products" asp-action="Index" class="block px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Products</a>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Admin" asp-action="Index" class="block px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Admin</a>
+                    }
+                    <a asp-controller="Orders" asp-action="Index" class="block px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Orders</a>
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="block w-full text-left px-3 py-2 rounded-md text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="block px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Login</a>
+                    <a asp-controller="Account" asp-action="Register" class="block px-3 py-2 rounded-md text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700">Register</a>
+                }
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow">
+        @RenderBody()
+    </main>
+
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">🛒 ECommerce</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">Your one-stop shop for everything you need.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a asp-controller="Home" asp-action="Index" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Home</a></li>
+                        <li><a asp-controller="Products" asp-action="Index" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Products</a></li>
+                        <li><a asp-controller="Cart" asp-action="Index" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Cart</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Account</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a asp-controller="Account" asp-action="Login" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Login</a></li>
+                        <li><a asp-controller="Account" asp-action="Register" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Register</a></li>
+                        <li><a asp-controller="Orders" asp-action="Index" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">My Orders</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 mt-8 pt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                &copy; @DateTime.Now.Year ECommerce. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function cartStore() {
+            return {
+                cart: [],
+                get cartCount() {
+                    return this.cart.reduce((sum, item) => sum + item.quantity, 0);
+                },
+                loadCart() {
+                    try {
+                        this.cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    } catch { this.cart = []; }
+                },
+                saveCart() {
+                    localStorage.setItem('cart', JSON.stringify(this.cart));
+                },
+                addToCart(productId, name, price, qty = 1) {
+                    const existing = this.cart.find(i => i.productId === productId);
+                    if (existing) {
+                        existing.quantity += qty;
+                    } else {
+                        this.cart.push({ productId, name, price, quantity: qty });
+                    }
+                    this.saveCart();
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: `${name} added to cart`,
+                        showConfirmButton: false,
+                        timer: 1500,
+                        timerProgressBar: true
+                    });
+                },
+                removeFromCart(productId) {
+                    this.cart = this.cart.filter(i => i.productId !== productId);
+                    this.saveCart();
+                },
+                updateQuantity(productId, qty) {
+                    const item = this.cart.find(i => i.productId === productId);
+                    if (item) {
+                        item.quantity = Math.max(1, parseInt(qty) || 1);
+                        this.saveCart();
+                    }
+                },
+                get cartTotal() {
+                    return this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                },
+                clearCart() {
+                    this.cart = [];
+                    this.saveCart();
+                }
+            };
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
