@@ -1,8 +1,9 @@
 # Deploy ASP.NET Core app to MonsterASP via FTP
 # Requires the following GitHub Secrets to be configured:
-#   FTP_SERVER   - Your MonsterASP FTP hostname (e.g. ftp.yourdomain.com)
-#   FTP_USERNAME - Your MonsterASP FTP username
-#   FTP_PASSWORD - Your MonsterASP FTP password
+#   FTP_SERVER         - Your MonsterASP FTP hostname (e.g. ftp.yourdomain.com)
+#   FTP_USERNAME       - Your MonsterASP FTP username
+#   FTP_PASSWORD       - Your MonsterASP FTP password
+#   CONNECTION_STRING  - Full database connection string
 
 name: Deploy to MonsterASP
 
@@ -27,6 +28,13 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore src/ECommerce.Web/ECommerce.Web.csproj
+
+    - name: Inject connection string into appsettings.json
+      run: |
+        jq --arg cs "${{ secrets.CONNECTION_STRING }}" \
+          '.ConnectionStrings.DefaultConnection = $cs' \
+          src/ECommerce.Web/appsettings.json > tmp.json && \
+          mv tmp.json src/ECommerce.Web/appsettings.json
 
     - name: Publish
       run: dotnet publish src/ECommerce.Web/ECommerce.Web.csproj --configuration Release --output ./publish
