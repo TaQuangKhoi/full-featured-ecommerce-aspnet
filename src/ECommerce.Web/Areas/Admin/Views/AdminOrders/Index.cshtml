@@ -26,14 +26,14 @@
                         {
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a asp-controller="Admin" asp-action="OrderDetails" asp-route-id="@order.Id" class="text-indigo-600 dark:text-indigo-400 hover:underline">
+                                    <a asp-area="Admin" asp-controller="AdminOrders" asp-action="Details" asp-route-id="@order.Id" class="text-indigo-600 dark:text-indigo-400 hover:underline">
                                         #@order.Id.ToString().Substring(0, 8).ToUpper()
                                     </a>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">@order.CustomerEmail</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">@order.OrderDate.ToString("MMM dd, yyyy")</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <form asp-controller="Admin" asp-action="UpdateOrderStatus" asp-route-id="@order.Id" method="post" class="inline">
+                                    <form asp-area="Admin" asp-controller="AdminOrders" asp-action="UpdateStatus" asp-route-id="@order.Id" method="post" class="inline">
                                         @Html.AntiForgeryToken()
                                         <select name="status" onchange="this.form.submit()"
                                                 class="px-3 py-1 rounded-lg text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
@@ -46,7 +46,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white text-right">$@order.Total.ToString("F2")</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                    <a asp-controller="Admin" asp-action="OrderDetails" asp-route-id="@order.Id"
+                                    <a asp-area="Admin" asp-controller="AdminOrders" asp-action="Details" asp-route-id="@order.Id"
                                        class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">View</a>
                                 </td>
                             </tr>
@@ -61,7 +61,7 @@
                     <nav class="flex justify-center space-x-2">
                         @for (int i = 1; i <= Model.TotalPages; i++)
                         {
-                            <a asp-controller="Admin" asp-action="Orders" asp-route-page="@i"
+                            <a asp-area="Admin" asp-controller="AdminOrders" asp-action="Index" asp-route-page="@i"
                                class="px-4 py-2 rounded-lg text-sm font-medium transition @(i == Model.Page ? "bg-indigo-600 text-white" : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600")">
                                 @i
                             </a>
