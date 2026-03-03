@@ -43,4 +43,12 @@ public class AdminCategoriesController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _sender.Send(new DeleteCategoryCommand(id));
+        return RedirectToAction(nameof(Index));
+    }
 }

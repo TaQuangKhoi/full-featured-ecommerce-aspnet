@@ -56,13 +56,13 @@
 
     <!-- Quick Links -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-        <a asp-controller="Admin" asp-action="Products" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-4 text-center font-medium transition">
+        <a asp-area="Admin" asp-controller="AdminProducts" asp-action="Index" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-4 text-center font-medium transition">
             Manage Products
         </a>
-        <a asp-controller="Admin" asp-action="Orders" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-4 text-center font-medium transition">
+        <a asp-area="Admin" asp-controller="AdminOrders" asp-action="Index" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-4 text-center font-medium transition">
             Manage Orders
         </a>
-        <a asp-controller="Admin" asp-action="Categories" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-4 text-center font-medium transition">
+        <a asp-area="Admin" asp-controller="AdminCategories" asp-action="Index" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl p-4 text-center font-medium transition">
             Manage Categories
         </a>
     </div>
@@ -99,7 +99,7 @@
 
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a asp-controller="Admin" asp-action="OrderDetails" asp-route-id="@order.Id" class="text-indigo-600 dark:text-indigo-400 hover:underline">
+                                    <a asp-area="Admin" asp-controller="AdminOrders" asp-action="Details" asp-route-id="@order.Id" class="text-indigo-600 dark:text-indigo-400 hover:underline">
                                         #@order.Id.ToString().Substring(0, 8).ToUpper()
                                     </a>
                                 </td>

@@ -9,7 +9,7 @@
     <!-- Create Category Form -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Create Category</h2>
-        <form asp-controller="Admin" asp-action="CreateCategory" method="post" class="flex flex-col sm:flex-row gap-4">
+        <form asp-area="Admin" asp-controller="AdminCategories" asp-action="Create" method="post" class="flex flex-col sm:flex-row gap-4">
             @Html.AntiForgeryToken()
             <div class="flex-grow">
                 <input type="text" name="Name" required placeholder="Category name"
@@ -60,7 +60,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">@category.Slug</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">@(category.ParentName ?? "—")</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                    <form asp-controller="Admin" asp-action="DeleteCategory" asp-route-id="@category.Id" method="post" class="inline"
+                                    <form asp-area="Admin" asp-controller="AdminCategories" asp-action="Delete" asp-route-id="@category.Id" method="post" class="inline"
                                           onsubmit="return confirm('Are you sure you want to delete this category?');">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="text-red-600 dark:text-red-400 hover:underline font-medium">Delete</button>
