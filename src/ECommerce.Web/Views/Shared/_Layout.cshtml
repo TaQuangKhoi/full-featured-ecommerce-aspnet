@@ -144,6 +144,7 @@
         function cartStore() {
             return {
                 cart: [],
+                showCheckout: false,
                 get cartCount() {
                     return this.cart.reduce((sum, item) => sum + item.quantity, 0);
                 },

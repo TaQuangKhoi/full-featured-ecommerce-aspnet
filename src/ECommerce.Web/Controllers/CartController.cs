@@ -37,7 +37,7 @@ public class CartController : Controller
             ShippingAddress: request.ShippingAddress,
             Items: items));
 
-        return Json(new { orderId });
+        return Json(new { success = true, orderId });
     }
 }
 

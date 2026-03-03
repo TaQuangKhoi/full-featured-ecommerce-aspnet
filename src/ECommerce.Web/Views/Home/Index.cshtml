@@ -65,7 +65,7 @@
                         }
                         <div class="flex items-center justify-between mt-4">
                             <span class="text-xl font-bold text-indigo-600 dark:text-indigo-400">$@product.Price.ToString("F2")</span>
-                            <button @@click="addToCart('@product.Id', '@product.Name.Replace("'", "\\'")', @product.Price)"
+                            <button @@click="addToCart('@product.Id', '@product.Name.Replace("'", "\\'")', @product.Price.ToString(System.Globalization.CultureInfo.InvariantCulture))"
                                     class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
                                 Add to Cart
                             </button>

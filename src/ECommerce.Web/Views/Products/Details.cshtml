@@ -54,7 +54,7 @@
                             <span x-text="qty" class="px-4 py-2 text-gray-900 dark:text-white font-medium min-w-[3rem] text-center"></span>
                             <button @@click="qty = Math.min(@Model.Stock, qty + 1)" class="px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-r-lg transition">+</button>
                         </div>
-                        <button @@click="addToCart('@Model.Id', '@Model.Name.Replace("'", "\\'")', @Model.Price, qty)"
+                        <button @@click="addToCart('@Model.Id', '@Model.Name.Replace("'", "\\'")', @Model.Price.ToString(System.Globalization.CultureInfo.InvariantCulture), qty)"
                                 class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition text-center">
                             Add to Cart
                         </button>
