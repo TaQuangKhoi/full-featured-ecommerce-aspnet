@@ -5,11 +5,31 @@ using Serilog;
 using Microsoft.OpenApi.Models;
 using System.Threading.RateLimiting;
 
+// Bootstrap logger captures startup errors before full Serilog configuration loads
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/startup-.txt", rollingInterval: RollingInterval.Day)
+    .CreateBootstrapLogger();
+
+Log.Information("Starting ECommerce application...");
+
+try
+{
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Serilog
-builder.Host.UseSerilog((context, config) =>
-    config.ReadFrom.Configuration(context.Configuration));
+// Serilog - replace bootstrap logger with full configuration from appsettings
+builder.Host.UseSerilog((context, services, config) =>
+    config.ReadFrom.Configuration(context.Configuration)
+          .ReadFrom.Services(services)
+          .Enrich.WithProperty("MachineName", Environment.MachineName)
+          .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName));
+
+Log.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
+Log.Information("ContentRoot: {ContentRoot}", builder.Environment.ContentRootPath);
+Log.Information("Connection string configured: {HasConnectionString}",
+    !string.IsNullOrEmpty(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services
 builder.Services.AddControllersWithViews();
@@ -82,4 +102,18 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+Log.Information("Application configured successfully. Starting web server...");
 app.Run();
+
+}
+catch (Exception ex) when (ex is not OperationCanceledException &&
+    ex.GetType().FullName != "Microsoft.Extensions.Hosting.Internal.StopTheHostException")
+{
+    Log.Fatal(ex, "Application terminated unexpectedly during startup");
+    throw;
+}
+finally
+{
+    Log.Information("Application shut down.");
+    Log.CloseAndFlush();
+}
