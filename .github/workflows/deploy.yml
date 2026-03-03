@@ -39,6 +39,25 @@ jobs:
     - name: Publish
       run: dotnet publish src/ECommerce.Web/ECommerce.Web.csproj --configuration Release --output ./publish
 
+    - name: Create app_offline.htm to stop IIS and release file locks
+      run: |
+        cat > ./app_offline.htm << 'EOF'
+        <!DOCTYPE html>
+        <html><head><title>Updating...</title></head>
+        <body><p>The application is being updated. Please try again in a moment.</p></body>
+        </html>
+        EOF
+
+    - name: Upload app_offline.htm via FTP
+      run: |
+        curl --silent --show-error --fail \
+          --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
+          --upload-file ./app_offline.htm \
+          "ftp://${{ secrets.FTP_SERVER }}/wwwroot/app_offline.htm"
+
+    - name: Wait for IIS to release file locks
+      run: sleep 10
+
     - name: Deploy to MonsterASP via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
@@ -47,3 +66,15 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./publish/
         server-dir: /wwwroot/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/app_offline.htm
+
+    - name: Remove app_offline.htm to bring app back online
+      if: always()
+      run: |
+        curl --silent --show-error \
+          --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
+          "ftp://${{ secrets.FTP_SERVER }}/" \
+          --quote "DELE /wwwroot/app_offline.htm"
