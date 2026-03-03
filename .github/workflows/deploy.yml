@@ -1,0 +1,41 @@
+# Deploy ASP.NET Core app to MonsterASP via FTP
+# Requires the following GitHub Secrets to be configured:
+#   FTP_SERVER   - Your MonsterASP FTP hostname (e.g. ftp.yourdomain.com)
+#   FTP_USERNAME - Your MonsterASP FTP username
+#   FTP_PASSWORD - Your MonsterASP FTP password
+
+name: Deploy to MonsterASP
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore src/ECommerce.Web/ECommerce.Web.csproj
+
+    - name: Publish
+      run: dotnet publish src/ECommerce.Web/ECommerce.Web.csproj --configuration Release --output ./publish
+
+    - name: Deploy to MonsterASP via FTP
+      uses: SamKirkland/FTP-Deploy-Action@4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./publish/
+        server-dir: /wwwroot/
