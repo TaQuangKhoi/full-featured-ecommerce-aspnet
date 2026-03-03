@@ -21,7 +21,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             Description = request.Description,
             Price = request.Price,
             Stock = request.Stock,
-            ImageUrl = request.ImageUrl,
+            ImageUrl = request.ImageUrl ?? string.Empty,
             CategoryId = request.CategoryId,
             IsActive = request.IsActive
         };

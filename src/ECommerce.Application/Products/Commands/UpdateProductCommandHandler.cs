@@ -21,7 +21,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.Description = request.Description;
         product.Price = request.Price;
         product.Stock = request.Stock;
-        product.ImageUrl = request.ImageUrl;
+        product.ImageUrl = request.ImageUrl ?? string.Empty;
         product.CategoryId = request.CategoryId;
         product.IsActive = request.IsActive;
 
