@@ -79,16 +79,16 @@ function checkoutForm() {
     return {
         address: '',
         submitting: false,
-        _cartStore: null,
 
         init() {
-            this._cartStore = Alpine.$data(document.body);
+            // Inherits cart and clearCart from parent cartStore in Alpine 3
         },
 
         async placeOrder() {
             this.submitting = true;
             try {
-                const cart = this._cartStore ? this._cartStore.cart : [];
+                // Accessing this.cart from parent scope
+                const cart = this.cart || [];
                 const res = await fetch('/Cart/Checkout', {
                     method: 'POST',
                     headers: {
@@ -101,7 +101,7 @@ function checkoutForm() {
                 this.submitting = false;
 
                 if (res.ok && data.success) {
-                    if (this._cartStore) this._cartStore.clearCart();
+                    this.clearCart();
                     await Swal.fire({ icon: 'success', title: 'Order Placed!', text: 'Your order has been placed successfully.' });
                     window.location.href = '/Orders';
                 } else if (res.status === 401) {
