@@ -140,61 +140,7 @@
         </div>
     </footer>
 
-    <script>
-        function cartStore() {
-            return {
-                cart: [],
-                showCheckout: false,
-                get cartCount() {
-                    return this.cart.reduce((sum, item) => sum + item.quantity, 0);
-                },
-                loadCart() {
-                    try {
-                        this.cart = JSON.parse(localStorage.getItem('cart') || '[]');
-                    } catch { this.cart = []; }
-                },
-                saveCart() {
-                    localStorage.setItem('cart', JSON.stringify(this.cart));
-                },
-                addToCart(productId, name, price, qty = 1) {
-                    const existing = this.cart.find(i => i.productId === productId);
-                    if (existing) {
-                        existing.quantity += qty;
-                    } else {
-                        this.cart.push({ productId, name, price, quantity: qty });
-                    }
-                    this.saveCart();
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: `${name} added to cart`,
-                        showConfirmButton: false,
-                        timer: 1500,
-                        timerProgressBar: true
-                    });
-                },
-                removeFromCart(productId) {
-                    this.cart = this.cart.filter(i => i.productId !== productId);
-                    this.saveCart();
-                },
-                updateQuantity(productId, qty) {
-                    const item = this.cart.find(i => i.productId === productId);
-                    if (item) {
-                        item.quantity = Math.max(1, parseInt(qty) || 1);
-                        this.saveCart();
-                    }
-                },
-                get cartTotal() {
-                    return this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                },
-                clearCart() {
-                    this.cart = [];
-                    this.saveCart();
-                }
-            };
-        }
-    </script>
+    <script src="~/js/cart.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
