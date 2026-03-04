@@ -56,5 +56,9 @@ nunit-*.xml
 # Node
 node_modules/
 
+# Local settings (contains secrets, never commit)
+appsettings.Local.json
+appsettings.*.Local.json
+
 # Tailwind CSS output
 wwwroot/css/output.css
