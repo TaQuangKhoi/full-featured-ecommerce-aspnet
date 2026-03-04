@@ -56,7 +56,16 @@ jobs:
           "ftp://${{ secrets.FTP_SERVER }}/wwwroot/app_offline.htm"
 
     - name: Wait for IIS to release file locks
-      run: sleep 10
+      run: |
+        echo "Waiting for app to go offline..."
+        for i in {1..15}; do
+          if curl --silent --fail --max-time 5 "${{ secrets.SITE_URL }}" | grep -q "being updated"; then
+            echo "App is offline after ${i} attempt(s). Proceeding."
+            break
+          fi
+          echo "Attempt $i/15: app not offline yet, retrying in 3s..."
+          sleep 3
+        done
 
     - name: Deploy to MonsterASP via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.6
