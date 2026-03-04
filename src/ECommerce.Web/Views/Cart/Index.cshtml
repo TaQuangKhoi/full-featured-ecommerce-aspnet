@@ -75,29 +75,7 @@
             <!-- Checkout Section -->
             <div x-show="showCheckout" x-transition class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Shipping Address</h2>
-                <form x-data="{ address: '', submitting: false }"
-                      @@submit.prevent="
-                          submitting = true;
-                          fetch('/Cart/Checkout', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                              body: JSON.stringify({ items: cart, shippingAddress: address })
-                          })
-                          .then(r => r.json().then(data => ({ ok: r.ok, status: r.status, data })))
-                          .then(({ ok, status, data }) => {
-                              submitting = false;
-                              if (ok && data.success) {
-                                  clearCart();
-                                  Swal.fire({ icon: 'success', title: 'Order Placed!', text: 'Your order has been placed successfully.' })
-                                  .then(() => window.location.href = '/Orders');
-                              } else if (status === 401) {
-                                  Swal.fire({ icon: 'warning', title: 'Login Required', text: data.message || 'You must be logged in to place an order.' })
-                                  .then(() => window.location.href = '/Account/Login?ReturnUrl=/Cart');
-                              } else {
-                                  Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Failed to place order.' });
-                              }
-                          })
-                          .catch(() => { submitting = false; Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong. Please try again.' }); });">
+                <form x-data="checkoutForm()" x-init="init($root)" @@submit.prevent="placeOrder()">
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Shipping Address</label>
                         <textarea x-model="address" rows="3" required placeholder="Enter your full shipping address..."
@@ -113,3 +91,47 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    function checkoutForm() {
+        return {
+            address: '',
+            submitting: false,
+            _cartStore: null,
+            init(rootEl) {
+                this._cartStore = Alpine.$data(rootEl);
+            },
+            async placeOrder() {
+                this.submitting = true;
+                try {
+                    const cart = this._cartStore ? this._cartStore.cart : [];
+                    const res = await fetch('/Cart/Checkout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ items: cart, shippingAddress: this.address })
+                    });
+                    const data = await res.json();
+                    this.submitting = false;
+                    if (res.ok && data.success) {
+                        if (this._cartStore) this._cartStore.clearCart();
+                        await Swal.fire({ icon: 'success', title: 'Order Placed!', text: 'Your order has been placed successfully.' });
+                        window.location.href = '/Orders';
+                    } else if (res.status === 401) {
+                        await Swal.fire({ icon: 'warning', title: 'Login Required', text: data.message || 'You must be logged in to place an order.' });
+                        window.location.href = '/Account/Login?ReturnUrl=/Cart';
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Failed to place order.' });
+                    }
+                } catch (e) {
+                    this.submitting = false;
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong. Please try again.' });
+                }
+            }
+        };
+    }
+</script>
+}
