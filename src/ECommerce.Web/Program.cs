@@ -19,6 +19,9 @@ try
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load local overrides (gitignored, use for local secrets/connection strings)
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+
 // Serilog - replace bootstrap logger with full configuration from appsettings
 builder.Host.UseSerilog((context, services, config) =>
     config.ReadFrom.Configuration(context.Configuration)
