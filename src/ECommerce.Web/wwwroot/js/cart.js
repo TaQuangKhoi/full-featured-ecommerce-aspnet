@@ -6,11 +6,16 @@
 /**
  * cartStore — global cart state, mounted on <body> via x-data="cartStore()" in _Layout.
  * Handles add/remove/update/clear and persists to localStorage.
+ * Also contains checkout form state so form is in the same Alpine scope (no nested x-data needed).
  */
 function cartStore() {
     return {
         cart: [],
         showCheckout: false,
+
+        // Checkout form state
+        checkoutAddress: '',
+        checkoutSubmitting: false,
 
         get cartCount() {
             return this.cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -67,41 +72,25 @@ function cartStore() {
         clearCart() {
             this.cart = [];
             this.saveCart();
-        }
-    };
-}
-
-/**
- * checkoutForm — Alpine component for the checkout form in Cart/Index.cshtml.
- * Reads cart state from the parent cartStore via Alpine.$data($root).
- */
-function checkoutForm() {
-    return {
-        address: '',
-        submitting: false,
-
-        init() {
-            // Inherits cart and clearCart from parent cartStore in Alpine 3
         },
 
         async placeOrder() {
-            this.submitting = true;
+            this.checkoutSubmitting = true;
             try {
-                // Accessing this.cart from parent scope
-                const cart = this.cart || [];
                 const res = await fetch('/Cart/Checkout', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({ items: cart, shippingAddress: this.address })
+                    body: JSON.stringify({ items: this.cart, shippingAddress: this.checkoutAddress })
                 });
                 const data = await res.json();
-                this.submitting = false;
+                this.checkoutSubmitting = false;
 
                 if (res.ok && data.success) {
                     this.clearCart();
+                    this.showCheckout = false;
                     await Swal.fire({ icon: 'success', title: 'Order Placed!', text: 'Your order has been placed successfully.' });
                     window.location.href = '/Orders';
                 } else if (res.status === 401) {
@@ -111,7 +100,7 @@ function checkoutForm() {
                     Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Failed to place order.' });
                 }
             } catch (e) {
-                this.submitting = false;
+                this.checkoutSubmitting = false;
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong. Please try again.' });
             }
         }
