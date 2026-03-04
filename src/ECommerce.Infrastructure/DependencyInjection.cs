@@ -1,6 +1,7 @@
 using ECommerce.Domain.Interfaces;
 using ECommerce.Infrastructure.Data;
 using ECommerce.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,20 @@ public static class DependencyInjection
             options.SlidingExpiration = true;               // Reset timer on each request
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
+            // Return JSON 401 instead of HTML redirect for AJAX/fetch requests
+            options.Events.OnRedirectToLogin = context =>
+            {
+                var isAjax = context.Request.Headers["X-Requested-With"] == "XMLHttpRequest"
+                             || context.Request.Headers["Content-Type"].ToString().Contains("application/json");
+                if (isAjax)
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync("{\"success\":false,\"message\":\"You must be logged in to place an order.\"}");
+                }
+                context.Response.Redirect(context.RedirectUri);
+                return Task.CompletedTask;
+            };
         });
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
