@@ -8,6 +8,6 @@ public record UpdateProductCommand(
     string Description,
     decimal Price,
     int Stock,
-    string ImageUrl,
+    string? ImageUrl,
     Guid CategoryId,
     bool IsActive) : IRequest<bool>;

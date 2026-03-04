@@ -7,6 +7,6 @@ public record CreateProductCommand(
     string Description,
     decimal Price,
     int Stock,
-    string ImageUrl,
+    string? ImageUrl,
     Guid CategoryId,
     bool IsActive = true) : IRequest<Guid>;
