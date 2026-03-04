@@ -10,6 +10,9 @@ name: Deploy to MonsterASP
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - "src/**"
+      - "tests/**"
 
 concurrency:
   group: deploy
