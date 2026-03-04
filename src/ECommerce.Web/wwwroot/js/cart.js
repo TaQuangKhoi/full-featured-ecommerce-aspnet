@@ -81,8 +81,8 @@ function checkoutForm() {
         submitting: false,
         _cartStore: null,
 
-        init(rootEl) {
-            this._cartStore = Alpine.$data(rootEl);
+        init() {
+            this._cartStore = Alpine.$data(document.body);
         },
 
         async placeOrder() {

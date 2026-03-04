@@ -75,7 +75,7 @@
             <!-- Checkout Section -->
             <div x-show="showCheckout" x-transition class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Shipping Address</h2>
-                <form x-data="checkoutForm()" x-init="init($root)" @@submit.prevent="placeOrder()">
+                <form x-data="checkoutForm()" x-init="init()" @@submit.prevent="placeOrder()">
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Shipping Address</label>
                         <textarea x-model="address" rows="3" required placeholder="Enter your full shipping address..."
