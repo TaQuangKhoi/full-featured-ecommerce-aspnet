@@ -6,11 +6,13 @@ namespace ECommerce.Tests.Web;
 public class ImageUrlExtensionsTests
 {
     [Fact]
-    public void ToHostedImageUrl_WithRootRelativePath_ReturnsHostedAbsoluteUrl()
+    public void ToHostedImageUrl_WithRootRelativePath_ReturnsOriginalUrl()
     {
-        var result = "/images/products/test.jpg".ToHostedImageUrl();
+        const string imageUrl = "/images/products/test.jpg";
 
-        result.Should().Be("https://full-featured-ecommerce-aspnet.runasp.net/images/products/test.jpg");
+        var result = imageUrl.ToHostedImageUrl();
+
+        result.Should().Be(imageUrl);
     }
 
     [Fact]
@@ -24,10 +26,22 @@ public class ImageUrlExtensionsTests
     }
 
     [Fact]
-    public void ToHostedImageUrl_WithRelativePathWithoutLeadingSlash_ReturnsHostedAbsoluteUrl()
+    public void ToHostedImageUrl_WithRelativePathWithoutLeadingSlash_ReturnsOriginalUrl()
     {
-        var result = "images/products/test.jpg".ToHostedImageUrl();
+        const string imageUrl = "images/products/test.jpg";
 
-        result.Should().Be("https://full-featured-ecommerce-aspnet.runasp.net/images/products/test.jpg");
+        var result = imageUrl.ToHostedImageUrl();
+
+        result.Should().Be(imageUrl);
+    }
+
+    [Fact]
+    public void ToHostedImageUrl_WithNull_ReturnsEmptyString()
+    {
+        string? imageUrl = null;
+
+        var result = imageUrl.ToHostedImageUrl();
+
+        result.Should().BeEmpty();
     }
 }
