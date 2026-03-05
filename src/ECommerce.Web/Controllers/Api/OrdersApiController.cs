@@ -26,7 +26,6 @@ public class OrdersApiController : ControllerBase
     /// POST /api/orders — place a new order (checkout).
     /// </summary>
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> PlaceOrder([FromBody] PlaceOrderDto dto)
     {
         var customerId = User.FindFirstValue(ClaimTypes.NameIdentifier);

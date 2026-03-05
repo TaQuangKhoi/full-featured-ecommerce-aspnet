@@ -100,15 +100,9 @@ function cartStore() {
         async placeOrder() {
             this.checkoutSubmitting = true;
             try {
-                const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
-                const headers = { 'Content-Type': 'application/json' };
-                if (antiForgeryToken) {
-                    headers['RequestVerificationToken'] = antiForgeryToken;
-                }
-
                 const res = await fetch('/api/orders', {
                     method: 'POST',
-                    headers,
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ items: this.cart, shippingAddress: this.checkoutAddress })
                 });
                 const data = await res.json();
