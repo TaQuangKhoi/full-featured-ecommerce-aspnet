@@ -67,7 +67,7 @@
                                 @if (!string.IsNullOrEmpty(product.ImageUrl))
                                 {
                                     <div class="h-48 overflow-hidden">
-                                        <img src="@product.ImageUrl" alt="@product.Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                        <img src="@product.ImageUrl.ToHostedImageUrl()" alt="@product.Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                     </div>
                                 }
                                 else
