@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ECommerce</title>
+    <meta name="user-authenticated" content="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {

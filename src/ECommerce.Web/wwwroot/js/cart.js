@@ -34,6 +34,29 @@ function cartStore() {
         },
 
         addToCart(productId, name, price, qty = 1) {
+            const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.content === 'true';
+            if (!isAuthenticated) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Login Required',
+                    html: 'You need to be logged in to add items to your cart.',
+                    confirmButtonText: '🔑 Login',
+                    confirmButtonColor: '#4f46e5',
+                    showDenyButton: true,
+                    denyButtonText: '✨ Register',
+                    denyButtonColor: '#6366f1',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/Account/Login?ReturnUrl=' + encodeURIComponent(window.location.pathname + window.location.search);
+                    } else if (result.isDenied) {
+                        window.location.href = '/Account/Register';
+                    }
+                });
+                return;
+            }
             const existing = this.cart.find(i => i.productId === productId);
             if (existing) {
                 existing.quantity += qty;
