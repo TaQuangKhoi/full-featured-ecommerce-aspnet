@@ -88,30 +88,6 @@ public class AdminProductsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(UpdateProductCommand command)
-    {
-        if (!ModelState.IsValid)
-        {
-            _logger.LogWarning("[AdminProducts] Edit product validation failed for ProductId={ProductId}", command.Id);
-            ViewBag.Categories = await _sender.Send(new GetCategoriesQuery());
-            return View(command);
-        }
-
-        _logger.LogInformation("[AdminProducts] Updating product ProductId={ProductId}, Name={Name}",
-            command.Id, command.Name);
-
-        var success = await _sender.Send(command);
-
-        if (success)
-            _logger.LogInformation("[AdminProducts] Product updated successfully. ProductId={ProductId}", command.Id);
-        else
-            _logger.LogWarning("[AdminProducts] Product update returned false. ProductId={ProductId}", command.Id);
-
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(Guid id)
     {
         _logger.LogInformation("[AdminProducts] Deleting product ProductId={ProductId}", id);
