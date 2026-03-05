@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Manage Carts";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+     id="admin-cart-page"
+     data-carts-url="@Url.Action("GetAll", "AdminCartsApi", new { area = "" })">
+
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Manage Carts</h1>
+        <div class="flex items-center space-x-3">
+            <select id="status-filter"
+                    class="px-3 py-2 rounded-lg text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Processing">Processing</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="alert-success" class="hidden mb-4 px-4 py-3 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg text-sm"></div>
+    <div id="alert-error" class="hidden mb-4 px-4 py-3 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-lg text-sm"></div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div id="loading-indicator" class="p-12 text-center text-gray-500 dark:text-gray-400">
+            <svg class="animate-spin mx-auto h-8 w-8 text-indigo-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            Loading carts…
+        </div>
+
+        <div id="carts-table-wrapper" class="hidden overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Order ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Items</th>
+                    </tr>
+                </thead>
+                <tbody id="carts-tbody" class="divide-y divide-gray-200 dark:divide-gray-700">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="empty-state" class="hidden p-12 text-center text-gray-500 dark:text-gray-400">
+            <p class="text-lg">No carts found.</p>
+        </div>
+    </div>
+
+    <div id="pagination" class="hidden mt-6 flex justify-center space-x-2"></div>
+</div>
+
+@section Scripts {
+    @Html.AntiForgeryToken()
+    <script src="~/js/admin-cart.js"></script>
+}
