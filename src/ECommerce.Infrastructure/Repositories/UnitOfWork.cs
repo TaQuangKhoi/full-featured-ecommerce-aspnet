@@ -11,6 +11,7 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<Category>? _categories;
     private IRepository<Order>? _orders;
     private IRepository<OrderItem>? _orderItems;
+    private IRepository<BannerSetting>? _bannerSettings;
     private bool _disposed;
 
     public UnitOfWork(ApplicationDbContext context)
@@ -29,6 +30,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<OrderItem> OrderItems =>
         _orderItems ??= new Repository<OrderItem>(_context);
+
+    public IRepository<BannerSetting> BannerSettings =>
+        _bannerSettings ??= new Repository<BannerSetting>(_context);
 
     public async Task<int> SaveChangesAsync()
     {

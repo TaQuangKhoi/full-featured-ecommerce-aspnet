@@ -8,5 +8,6 @@ public interface IUnitOfWork : IDisposable
     IRepository<Category> Categories { get; }
     IRepository<Order> Orders { get; }
     IRepository<OrderItem> OrderItems { get; }
+    IRepository<BannerSetting> BannerSettings { get; }
     Task<int> SaveChangesAsync();
 }

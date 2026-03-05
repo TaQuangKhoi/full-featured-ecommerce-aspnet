@@ -2,19 +2,41 @@
 @{
     ViewData["Title"] = "Home";
     var categories = ViewBag.Categories as List<ECommerce.Shared.DTOs.CategoryDto> ?? new List<ECommerce.Shared.DTOs.CategoryDto>();
+    var banner = ViewBag.Banner as ECommerce.Shared.DTOs.BannerSettingDto;
+    var bannerTitle = !string.IsNullOrWhiteSpace(banner?.Title) ? banner.Title : "Welcome to ECommerce";
+    var bannerSubtitle = !string.IsNullOrWhiteSpace(banner?.Subtitle) ? banner.Subtitle : "Discover amazing products at unbeatable prices. Shop the latest trends today.";
+    var hasBannerImage = !string.IsNullOrWhiteSpace(banner?.ImageUrl);
 }
 
 <!-- Hero Section -->
-<section class="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-4xl md:text-6xl font-extrabold mb-4">Welcome to ECommerce</h1>
-        <p class="text-xl md:text-2xl text-indigo-100 mb-8 max-w-2xl mx-auto">Discover amazing products at unbeatable prices. Shop the latest trends today.</p>
-        <a asp-controller="Products" asp-action="Index"
-           class="inline-block bg-white text-indigo-600 px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
-            Shop Now →
-        </a>
-    </div>
-</section>
+@if (hasBannerImage)
+{
+    <section class="relative text-white py-20 overflow-hidden"
+             style="background-image: url('@banner!.ImageUrl'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div class="absolute inset-0 bg-black/50"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-4">@bannerTitle</h1>
+            <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto">@bannerSubtitle</p>
+            <a asp-controller="Products" asp-action="Index"
+               class="inline-block bg-white text-indigo-600 px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
+                Shop Now →
+            </a>
+        </div>
+    </section>
+}
+else
+{
+    <section class="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-4">@bannerTitle</h1>
+            <p class="text-xl md:text-2xl text-indigo-100 mb-8 max-w-2xl mx-auto">@bannerSubtitle</p>
+            <a asp-controller="Products" asp-action="Index"
+               class="inline-block bg-white text-indigo-600 px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
+                Shop Now →
+            </a>
+        </div>
+    </section>
+}
 
 <!-- Category Filter Bar -->
 @if (categories.Any())
