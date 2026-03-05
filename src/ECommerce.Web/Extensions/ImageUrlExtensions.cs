@@ -2,7 +2,7 @@ namespace ECommerce.Web.Extensions;
 
 public static class ImageUrlExtensions
 {
-    private const string HostedImageBaseUrl = "http://full-featured-ecommerce-aspnet.runasp.net";
+    private const string HostedImageBaseUrl = "https://full-featured-ecommerce-aspnet.runasp.net";
 
     public static string ToHostedImageUrl(this string? imageUrl)
     {
