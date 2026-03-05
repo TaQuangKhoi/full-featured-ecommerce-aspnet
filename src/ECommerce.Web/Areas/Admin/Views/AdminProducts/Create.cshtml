@@ -12,7 +12,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Create Product</h1>
 
-        <form asp-area="Admin" asp-controller="AdminProducts" asp-action="Create" method="post">
+        <form asp-area="Admin" asp-controller="AdminProducts" asp-action="Create" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="mb-4 text-red-600 dark:text-red-400 text-sm"></div>
 
@@ -59,7 +59,13 @@
             </div>
 
             <div class="mb-6">
-                <label asp-for="ImageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Image URL (optional)</label>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Product Image</label>
+                    <input type="file" name="productImage" accept="image/*"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Accepted formats: JPG, PNG, WebP, GIF. Maximum file size: 5 MB. Uploading a file overrides the URL below.</p>
+                </div>
+                <label asp-for="ImageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Or enter an Image URL</label>
                 <input asp-for="ImageUrl" placeholder="https://..."
                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
                 <span asp-validation-for="ImageUrl" class="text-red-500 text-sm mt-1"></span>
