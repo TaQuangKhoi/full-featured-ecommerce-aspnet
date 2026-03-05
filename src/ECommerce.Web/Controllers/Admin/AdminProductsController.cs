@@ -14,11 +14,13 @@ public class AdminProductsController : Controller
 {
     private readonly ISender _sender;
     private readonly ILogger<AdminProductsController> _logger;
+    private readonly IWebHostEnvironment _environment;
 
-    public AdminProductsController(ISender sender, ILogger<AdminProductsController> logger)
+    public AdminProductsController(ISender sender, ILogger<AdminProductsController> logger, IWebHostEnvironment environment)
     {
         _sender = sender;
         _logger = logger;
+        _environment = environment;
     }
 
     [ActionName("Index")]
@@ -40,7 +42,7 @@ public class AdminProductsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(CreateProductCommand command)
+    public async Task<IActionResult> Create(CreateProductCommand command, IFormFile? productImage)
     {
         if (!ModelState.IsValid)
         {
@@ -49,12 +51,26 @@ public class AdminProductsController : Controller
             return View(command);
         }
 
+        if (productImage is { Length: > 0 })
+        {
+            var imageUrl = await SaveProductImageAsync(productImage);
+            if (imageUrl is null)
+            {
+                ViewBag.Categories = await _sender.Send(new GetCategoriesQuery());
+                return View(command);
+            }
+
+            command = command with { ImageUrl = imageUrl };
+            _logger.LogInformation("[AdminProducts] Product image uploaded: {ImageUrl}", imageUrl);
+        }
+
         _logger.LogInformation("[AdminProducts] Creating product Name={Name}, Price={Price}, CategoryId={CategoryId}",
             command.Name, command.Price, command.CategoryId);
 
         var id = await _sender.Send(command);
 
         _logger.LogInformation("[AdminProducts] Product created successfully. ProductId={ProductId}", id);
+        TempData["Success"] = "Product created successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -87,6 +103,63 @@ public class AdminProductsController : Controller
     }
 
     [HttpPost]
+    [Route("{id}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(Guid id, UpdateProductCommand command, IFormFile? productImage)
+    {
+        if (id != command.Id)
+        {
+            _logger.LogWarning("[AdminProducts] Edit product id mismatch: route={RouteId}, form={FormId}", id, command.Id);
+            return BadRequest();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            _logger.LogWarning("[AdminProducts] Edit product validation failed for ProductId={ProductId}", id);
+            ViewBag.Categories = await _sender.Send(new GetCategoriesQuery());
+            return View(command);
+        }
+
+        if (productImage is { Length: > 0 })
+        {
+            var imageUrl = await SaveProductImageAsync(productImage);
+            if (imageUrl is null)
+            {
+                ViewBag.Categories = await _sender.Send(new GetCategoriesQuery());
+                return View(command);
+            }
+
+            // Delete the old locally-stored product image to avoid orphaned files
+            if (command.ImageUrl is { } oldUrl && oldUrl.StartsWith("/images/products/"))
+            {
+                var oldPath = Path.Combine(_environment.WebRootPath, oldUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                if (System.IO.File.Exists(oldPath))
+                {
+                    System.IO.File.Delete(oldPath);
+                    _logger.LogInformation("[AdminProducts] Deleted old product image: {OldUrl}", oldUrl);
+                }
+            }
+
+            command = command with { ImageUrl = imageUrl };
+            _logger.LogInformation("[AdminProducts] Product image uploaded: {ImageUrl}", imageUrl);
+        }
+
+        _logger.LogInformation("[AdminProducts] Updating product ProductId={ProductId}, Name={Name}", id, command.Name);
+
+        var success = await _sender.Send(command);
+
+        if (!success)
+        {
+            _logger.LogWarning("[AdminProducts] Product not found for update. ProductId={ProductId}", id);
+            return NotFound();
+        }
+
+        _logger.LogInformation("[AdminProducts] Product updated successfully. ProductId={ProductId}", id);
+        TempData["Success"] = "Product updated successfully.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -100,5 +173,35 @@ public class AdminProductsController : Controller
             _logger.LogWarning("[AdminProducts] Product delete returned false (not found?). ProductId={ProductId}", id);
 
         return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<string?> SaveProductImageAsync(IFormFile productImage)
+    {
+        const long maxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
+        if (productImage.Length > maxFileSizeBytes)
+        {
+            ModelState.AddModelError(string.Empty, "File size must not exceed 5 MB.");
+            return null;
+        }
+
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+        var extension = Path.GetExtension(productImage.FileName).ToLowerInvariant();
+
+        if (!allowedExtensions.Contains(extension))
+        {
+            ModelState.AddModelError(string.Empty, "Only image files (jpg, jpeg, png, webp, gif) are allowed.");
+            return null;
+        }
+
+        var productsDir = Path.Combine(_environment.WebRootPath, "images", "products");
+        Directory.CreateDirectory(productsDir);
+
+        var fileName = $"product_image_{Guid.NewGuid()}{extension}";
+        var filePath = Path.Combine(productsDir, fileName);
+
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await productImage.CopyToAsync(stream);
+
+        return $"/images/products/{fileName}";
     }
 }

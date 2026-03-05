@@ -12,77 +12,88 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Product</h1>
 
-        <div id="alert-success" class="hidden mb-4 px-4 py-3 rounded-lg bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm"></div>
-        <div id="alert-error" class="hidden mb-4 px-4 py-3 rounded-lg bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-sm"></div>
+        <div asp-validation-summary="ModelOnly" class="mb-4 text-red-600 dark:text-red-400 text-sm"></div>
 
-        <form id="edit-product-form" novalidate
-              data-index-url="@Url.Action("Index", "AdminProducts", new { area = "Admin" })">
-            <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+        <form asp-area="Admin" asp-controller="AdminProducts" asp-action="Edit" asp-route-id="@Model.Id"
+              method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
 
             <div class="mb-5">
-                <label for="Name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label>
-                <input id="Name" name="Name" value="@Model.Name" placeholder="Product name"
-                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required maxlength="200" />
-                <span class="field-error text-red-500 text-sm mt-1" data-field="Name"></span>
+                <label asp-for="Name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"></label>
+                <input asp-for="Name" placeholder="Product name"
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                <span asp-validation-for="Name" class="text-red-500 text-sm mt-1"></span>
             </div>
 
             <div class="mb-5">
-                <label for="Description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
-                <textarea id="Description" name="Description" rows="4" placeholder="Product description"
-                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" maxlength="2000">@Model.Description</textarea>
-                <span class="field-error text-red-500 text-sm mt-1" data-field="Description"></span>
+                <label asp-for="Description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"></label>
+                <textarea asp-for="Description" rows="4" placeholder="Product description"
+                          class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                <span asp-validation-for="Description" class="text-red-500 text-sm mt-1"></span>
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-5">
                 <div>
-                    <label for="Price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price</label>
-                    <input id="Price" name="Price" type="number" step="0.01" min="0.01" value="@Model.Price"
-                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required />
-                    <span class="field-error text-red-500 text-sm mt-1" data-field="Price"></span>
+                    <label asp-for="Price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"></label>
+                    <input asp-for="Price" type="number" step="0.01" min="0.01"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                    <span asp-validation-for="Price" class="text-red-500 text-sm mt-1"></span>
                 </div>
                 <div>
-                    <label for="Stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stock</label>
-                    <input id="Stock" name="Stock" type="number" min="0" value="@Model.Stock"
-                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required />
-                    <span class="field-error text-red-500 text-sm mt-1" data-field="Stock"></span>
+                    <label asp-for="Stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"></label>
+                    <input asp-for="Stock" type="number" min="0"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                    <span asp-validation-for="Stock" class="text-red-500 text-sm mt-1"></span>
                 </div>
             </div>
 
             <div class="mb-5">
-                <label for="CategoryId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
-                <select id="CategoryId" name="CategoryId"
-                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                <label asp-for="CategoryId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+                <select asp-for="CategoryId"
+                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
                     <option value="">Select a category</option>
                     @foreach (var cat in categories)
                     {
-                        if (cat.Id == Model.CategoryId)
-                        {
-                            <option value="@cat.Id" selected>@cat.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@cat.Id">@cat.Name</option>
-                        }
+                        <option value="@cat.Id">@cat.Name</option>
                     }
                 </select>
-                <span class="field-error text-red-500 text-sm mt-1" data-field="CategoryId"></span>
+                <span asp-validation-for="CategoryId" class="text-red-500 text-sm mt-1"></span>
             </div>
 
-            <div class="mb-5">
-                <label for="ImageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Image URL (optional)</label>
-                <input id="ImageUrl" name="ImageUrl" value="@Model.ImageUrl" placeholder="https://..."
-                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" maxlength="500" />
-                <span class="field-error text-red-500 text-sm mt-1" data-field="ImageUrl"></span>
+            <!-- Current product image preview -->
+            @if (!string.IsNullOrEmpty(Model?.ImageUrl))
+            {
+                <div class="mb-4">
+                    <p class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Product Image</p>
+                    <div class="relative rounded-lg overflow-hidden h-48 bg-gray-100 dark:bg-gray-700">
+                        <img src="@Model.ImageUrl" alt="Current product image" class="w-full h-full object-contain" />
+                    </div>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1 truncate">@Model.ImageUrl</p>
+                </div>
+            }
+
+            <div class="mb-6">
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Product Image</label>
+                    <input type="file" name="productImage" accept="image/*"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Accepted formats: JPG, PNG, WebP, GIF. Maximum file size: 5 MB. Uploading a file overrides the URL below.</p>
+                </div>
+                <label asp-for="ImageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Or enter an Image URL</label>
+                <input asp-for="ImageUrl" placeholder="https://..."
+                       class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                <span asp-validation-for="ImageUrl" class="text-red-500 text-sm mt-1"></span>
             </div>
 
             <div class="mb-6">
                 <label class="flex items-center space-x-3">
-                    <input id="IsActive" name="IsActive" type="checkbox" class="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500" @(Model.IsActive ? "checked" : "") />
+                    <input asp-for="IsActive" type="checkbox" class="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500" />
                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Active</span>
                 </label>
             </div>
 
-            <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-medium transition">
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-medium transition">
                 Update Product
             </button>
         </form>
@@ -90,6 +101,5 @@
 </div>
 
 @section Scripts {
-@Html.AntiForgeryToken()
-<script src="~/js/admin-edit-product.js"></script>
+    <partial name="_ValidationScriptsPartial" />
 }
