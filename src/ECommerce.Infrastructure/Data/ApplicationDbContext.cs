@@ -15,6 +15,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<BannerSetting> BannerSettings => Set<BannerSetting>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

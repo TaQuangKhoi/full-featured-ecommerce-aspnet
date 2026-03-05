@@ -2,6 +2,7 @@ using System.Diagnostics;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.Application.Products.Queries;
+using ECommerce.Application.Settings.Queries;
 using ECommerce.Web.Models;
 
 namespace ECommerce.Web.Controllers;
@@ -20,6 +21,8 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         var products = await _sender.Send(new GetProductsQuery(Page: 1, PageSize: 8));
+        var banner = await _sender.Send(new GetBannerSettingQuery());
+        ViewBag.Banner = banner;
         return View(products);
     }
 
