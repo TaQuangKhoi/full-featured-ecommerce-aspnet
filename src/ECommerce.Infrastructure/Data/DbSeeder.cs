@@ -83,7 +83,7 @@ public static class DbSeeder
                         Description = "Premium noise-cancelling wireless headphones with 30-hour battery life and comfortable over-ear design.",
                         Price = 79.99m,
                         Stock = 150,
-                        ImageUrl = "/images/headphones.jpg",
+                        ImageUrl = "https://full-featured-ecommerce-aspnet.runasp.net/images/headphones.jpg",
                         CategoryId = electronics.Id,
                         IsActive = true
                     },
@@ -94,7 +94,7 @@ public static class DbSeeder
                         Description = "55-inch 4K UHD Smart TV with HDR support, built-in streaming apps, and voice control.",
                         Price = 549.99m,
                         Stock = 40,
-                        ImageUrl = "/images/smart-tv.jpg",
+                        ImageUrl = "https://full-featured-ecommerce-aspnet.runasp.net/images/smart-tv.jpg",
                         CategoryId = electronics.Id,
                         IsActive = true
                     },
@@ -105,7 +105,7 @@ public static class DbSeeder
                         Description = "Soft 100% organic cotton t-shirt available in multiple colors. Perfect for everyday wear.",
                         Price = 24.99m,
                         Stock = 500,
-                        ImageUrl = "/images/tshirt.jpg",
+                        ImageUrl = "https://full-featured-ecommerce-aspnet.runasp.net/images/tshirt.jpg",
                         CategoryId = clothing.Id,
                         IsActive = true
                     },
@@ -116,7 +116,7 @@ public static class DbSeeder
                         Description = "Modern slim fit jeans made from stretch denim for all-day comfort and style.",
                         Price = 59.99m,
                         Stock = 200,
-                        ImageUrl = "/images/jeans.jpg",
+                        ImageUrl = "https://full-featured-ecommerce-aspnet.runasp.net/images/jeans.jpg",
                         CategoryId = clothing.Id,
                         IsActive = true
                     },
@@ -127,7 +127,7 @@ public static class DbSeeder
                         Description = "A comprehensive guide to writing maintainable, readable, and efficient code for modern developers.",
                         Price = 34.99m,
                         Stock = 300,
-                        ImageUrl = "/images/clean-code.jpg",
+                        ImageUrl = "https://full-featured-ecommerce-aspnet.runasp.net/images/clean-code.jpg",
                         CategoryId = books.Id,
                         IsActive = true
                     },
@@ -138,7 +138,7 @@ public static class DbSeeder
                         Description = "In-depth exploration of cloud design patterns, scalability strategies, and best practices.",
                         Price = 44.99m,
                         Stock = 250,
-                        ImageUrl = "/images/cloud-architecture.jpg",
+                        ImageUrl = "https://full-featured-ecommerce-aspnet.runasp.net/images/cloud-architecture.jpg",
                         CategoryId = books.Id,
                         IsActive = true
                     }
