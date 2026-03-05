@@ -1,9 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ECommerce.Application.Orders.Commands;
 using ECommerce.Application.Orders.Queries;
-using ECommerce.Domain.Enums;
 
 namespace ECommerce.Web.Controllers.Admin;
 
@@ -46,21 +44,5 @@ public class AdminOrdersController : Controller
             order.Id, order.Status, order.CustomerId);
 
         return View(order);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UpdateStatus(Guid id, OrderStatus status)
-    {
-        _logger.LogInformation("[AdminOrders] Updating order status. OrderId={OrderId}, NewStatus={Status}", id, status);
-
-        var success = await _sender.Send(new UpdateOrderStatusCommand(id, status));
-
-        if (success)
-            _logger.LogInformation("[AdminOrders] Order status updated successfully. OrderId={OrderId}, Status={Status}", id, status);
-        else
-            _logger.LogWarning("[AdminOrders] Order status update returned false (not found?). OrderId={OrderId}", id);
-
-        return RedirectToAction(nameof(Details), new { id });
     }
 }

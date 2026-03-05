@@ -16,7 +16,14 @@
         <a asp-area="Admin" asp-controller="AdminOrders" asp-action="Index" class="text-indigo-600 dark:text-indigo-400 hover:underline">← Back to Orders</a>
     </nav>
 
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 md:p-8">
+    <div id="admin-order-details"
+         class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 md:p-8"
+         data-carts-url="@Url.Action("GetAll", "AdminCartsApi", new { area = "" })"
+         data-order-id="@Model.Id">
+
+        <div id="alert-success" class="hidden mb-4 px-4 py-3 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg text-sm"></div>
+        <div id="alert-error" class="hidden mb-4 px-4 py-3 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-lg text-sm"></div>
+
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Order #@Model.Id.ToString().Substring(0, 8).ToUpper()</h1>
@@ -24,17 +31,17 @@
                 <p class="text-gray-500 dark:text-gray-400 mt-1">Customer: @Model.CustomerEmail</p>
             </div>
             <div class="mt-4 sm:mt-0">
-                <form asp-area="Admin" asp-controller="AdminOrders" asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post" class="flex items-center space-x-2">
-                    @Html.AntiForgeryToken()
-                    <select name="status"
+                <div class="flex items-center space-x-2">
+                    <select id="order-status-select"
                             class="px-3 py-2 rounded-lg text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
                         @foreach (var status in new[] { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" })
                         {
                             <option value="@status" selected="@(Model.Status == status)">@status</option>
                         }
                     </select>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Update</button>
-                </form>
+                    <button id="update-status-btn" type="button"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Update</button>
+                </div>
             </div>
         </div>
 
@@ -76,3 +83,8 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @Html.AntiForgeryToken()
+    <script src="~/js/admin-orders.js"></script>
+}

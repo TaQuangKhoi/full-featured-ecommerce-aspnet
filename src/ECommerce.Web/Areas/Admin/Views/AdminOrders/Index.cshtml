@@ -3,8 +3,14 @@
     ViewData["Title"] = "Manage Orders";
 }
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+     id="admin-orders-index"
+     data-carts-url="@Url.Action("GetAll", "AdminCartsApi", new { area = "" })">
+
     <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Manage Orders</h1>
+
+    <div id="alert-success" class="hidden mb-4 px-4 py-3 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg text-sm"></div>
+    <div id="alert-error" class="hidden mb-4 px-4 py-3 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-lg text-sm"></div>
 
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
         @if (Model?.Items?.Any() == true)
@@ -33,16 +39,13 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">@order.CustomerEmail</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">@order.OrderDate.ToString("MMM dd, yyyy")</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <form asp-area="Admin" asp-controller="AdminOrders" asp-action="UpdateStatus" asp-route-id="@order.Id" method="post" class="inline">
-                                        @Html.AntiForgeryToken()
-                                        <select name="status" onchange="this.form.submit()"
-                                                class="px-3 py-1 rounded-lg text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
-                                            @foreach (var status in new[] { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" })
-                                            {
-                                                <option value="@status" selected="@(order.Status == status)">@status</option>
-                                            }
-                                        </select>
-                                    </form>
+                                    <select class="status-select px-3 py-1 rounded-lg text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                                            data-order-id="@order.Id">
+                                        @foreach (var status in new[] { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" })
+                                        {
+                                            <option value="@status" selected="@(order.Status == status)">@status</option>
+                                        }
+                                    </select>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white text-right">$@order.Total.ToString("F2")</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
@@ -78,3 +81,8 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    @Html.AntiForgeryToken()
+    <script src="~/js/admin-orders.js"></script>
+}
