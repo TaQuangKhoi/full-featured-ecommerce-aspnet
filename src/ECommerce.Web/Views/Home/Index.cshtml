@@ -12,7 +12,7 @@
 @if (hasBannerImage)
 {
     <section class="relative text-white py-20 overflow-hidden"
-             style="background-image: url('@banner!.ImageUrl'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+             style="background-image: url('@banner!.ImageUrl.ToHostedImageUrl()'); background-size: cover; background-position: center; background-repeat: no-repeat;">
         <div class="absolute inset-0 bg-black/50"></div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 class="text-4xl md:text-6xl font-extrabold mb-4">@bannerTitle</h1>
@@ -76,7 +76,7 @@ else
                         @if (!string.IsNullOrEmpty(product.ImageUrl))
                         {
                             <div class="h-48 overflow-hidden">
-                                <img src="@product.ImageUrl" alt="@product.Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                <img src="@product.ImageUrl.ToHostedImageUrl()" alt="@product.Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                             </div>
                         }
                         else

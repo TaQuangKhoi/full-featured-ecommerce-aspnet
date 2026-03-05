@@ -17,7 +17,7 @@
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
                 <div class="h-72 md:h-full min-h-[24rem] overflow-hidden">
-                    <img src="@Model.ImageUrl" alt="@Model.Name" class="w-full h-full object-cover" />
+                    <img src="@Model.ImageUrl.ToHostedImageUrl()" alt="@Model.Name" class="w-full h-full object-cover" />
                 </div>
             }
             else

@@ -27,7 +27,7 @@
             <div class="mb-6">
                 <p class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Banner Image</p>
                 <div class="relative rounded-lg overflow-hidden h-48 bg-gray-100 dark:bg-gray-700">
-                    <img src="@Model.ImageUrl" alt="Current banner" class="w-full h-full object-cover" />
+                    <img src="@Model.ImageUrl.ToHostedImageUrl()" alt="Current banner" class="w-full h-full object-cover" />
                 </div>
                 <p class="text-xs text-gray-400 dark:text-gray-500 mt-1 truncate">@Model.ImageUrl</p>
             </div>
