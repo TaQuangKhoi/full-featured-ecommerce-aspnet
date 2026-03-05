@@ -28,12 +28,13 @@ public static class DependencyInjection
             options.SlidingExpiration = true;               // Reset timer on each request
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
-            // Return JSON 401 instead of HTML redirect for AJAX/fetch requests
+            // Return JSON 401 instead of HTML redirect for API/AJAX/fetch requests
             options.Events.OnRedirectToLogin = context =>
             {
-                var isAjax = context.Request.Headers["X-Requested-With"] == "XMLHttpRequest"
-                             || context.Request.Headers["Content-Type"].ToString().Contains("application/json");
-                if (isAjax)
+                var isApiRequest = context.Request.Path.StartsWithSegments("/api")
+                                   || context.Request.Headers["X-Requested-With"] == "XMLHttpRequest"
+                                   || context.Request.Headers["Content-Type"].ToString().Contains("application/json");
+                if (isApiRequest)
                 {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     context.Response.ContentType = "application/json";
